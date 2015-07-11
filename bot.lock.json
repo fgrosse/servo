@@ -1,0 +1,18 @@
+{
+    "packages": [
+        {
+            "name": "github.com/onsi/ginkgo",
+            "source": {
+                "type": "git",
+                "version": "25380c62e61d3f90436be125b8127dbae578fdef"
+            }
+        },
+        {
+            "name": "github.com/onsi/gomega",
+            "source": {
+                "type": "git",
+                "version": "d6c945f9fdbf6cad99e85b0feff591caa268e0db"
+            }
+        }
+    ]
+}

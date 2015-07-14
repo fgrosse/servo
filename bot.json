@@ -12,6 +12,11 @@
                 "name": "github.com/onsi/gomega",
                 "type": "git",
                 "version": "branch:master"
+            },
+            {
+                "name": "github.com/fgrosse/goldi",
+                "type": "git",
+                "version": "branch:master"
             }
         ]
     },

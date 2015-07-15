@@ -1,0 +1,10 @@
+# The following two parameters are used in "Kernel Run should load the configuration"
+foo: value1
+bar: value2
+
+# The following two parameters are used in "Kernel Run should flatten all configuration parameters"
+nested:
+  foo:
+    value: nested value 1
+  bar:
+    value: nested value 2

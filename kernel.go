@@ -2,61 +2,63 @@ package servo
 
 import (
 	"fmt"
-	"os"
-	"runtime/debug"
 
 	"github.com/fgrosse/goldi"
-	"log"
 )
 
+// The Kernel is basically a goldi.TypeRegistry on which all necessary types are registered.
+// Once type registration is done it is started with its Run function.
 type Kernel struct {
-	*goldi.Container
+	goldi.TypeRegistry
+	Config    ConfigurationLoader
+	Validator *goldi.ContainerValidator
 }
 
-func NewKernel(configFilePath string) *Kernel {
-	registry := goldi.NewTypeRegistry()
-	registerInternalTypes(registry)
-
-	config := loadConfiguration(configFilePath)
-	return &Kernel {
-		Container: goldi.NewContainer(registry, config),
+// NewKernel creates a new kernel.
+// It will initialize the goldi.TypeRegistry and use the given configuration loader.
+// The actual loading of the configuration is deferred until kernel.Run is called.
+func NewKernel(config ConfigurationLoader) *Kernel {
+	kernel := &Kernel{
+		TypeRegistry: goldi.NewTypeRegistry(),
+		Config:       config,
+		Validator:    goldi.NewContainerValidator(),
 	}
+
+	registerInternalTypes(kernel.TypeRegistry)
+	return kernel
 }
 
-func loadConfiguration(configFilePath string) map[string]interface{} {
-	// TODO load from file
-	// TODO flatten configuration keys
-	return map[string]interface{}{
-		"servo.listen": "0.0.0.0:3000",
-	}
-}
-
-func (k *Kernel) Run() {
-	defer k.panicHandler()
-
-	k.validateContainer()
-	server := k.Get("kernel.server").(Server)
-	err := server.Run()
+// Run creates a goldi.Container based on the TypeRegistry of the kernel and used the configuration loader.
+// It does then instantiate the "kernel.server" type and calls Run on the resulting Server implementation.
+// This method blocks until the server returns from Run.
+func (k *Kernel) Run() error {
+	container, err := k.createContainer()
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	server := container.Get("kernel.server").(Server)
+	return server.Run()
 }
 
-func (k *Kernel) panicHandler() {
-	if r := recover(); r != nil {
-		// TODO implement useful panic handling
-		log.Printf("PANIC: %v\n", r)
-		debug.PrintStack()
-		os.Exit(1)
+func (k *Kernel) createContainer() (*goldi.Container, error) {
+	// TODO defer panic handler for validateContainer (maybe change in goldi)
+	config, err := k.Config.Load()
+
+	if err != nil {
+		return nil, err
 	}
+
+	container := goldi.NewContainer(k.TypeRegistry, config)
+	k.validateContainer(container)
+
+	return container, nil
 }
 
-func (k *Kernel) validateContainer() {
-	validator := goldi.NewContainerValidator()
-
+func (k *Kernel) validateContainer(container *goldi.Container) {
 	// TODO add explicit type checks for all internal types that might have gotten overwritten
 
-	err := validator.Validate(k.Container)
+	err := k.Validator.Validate(container)
 	if err != nil {
 		panic(fmt.Errorf("container validation error: %s", err))
 	}

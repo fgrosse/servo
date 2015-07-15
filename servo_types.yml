@@ -2,7 +2,7 @@ types:
     kernel.server:
         package: github.com/fgrosse/servo
         type:    Server
-        factory: NewDefaultServer
+        factory: NewHTTPServer
         arguments:
             - "%servo.listen%"
             - "@kernel.http_handler" # this type must be registered by the application

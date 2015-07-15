@@ -6,7 +6,8 @@ import (
 )
 
 func main() {
-	kernel := servo.NewKernel("config.yml")
+	config := servo.NewYAMLFileLoader("config.yml")
+	kernel := servo.NewKernel(config)
 	example.RegisterTypes(kernel.TypeRegistry)
 	kernel.Run()
 }

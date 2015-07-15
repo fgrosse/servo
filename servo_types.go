@@ -10,5 +10,5 @@ import (
 // It is however good practice to put this file under version control.
 // See https://github.com/FGrosse/goldi for what is going on here.
 func registerInternalTypes(types goldi.TypeRegistry) {
-	types.RegisterType("kernel.server", NewDefaultServer, "%servo.listen%", "@kernel.http_handler")
+	types.RegisterType("kernel.server", NewHTTPServer, "%servo.listen%", "@kernel.http_handler")
 }

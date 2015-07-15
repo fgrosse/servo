@@ -17,6 +17,11 @@
                 "name": "github.com/fgrosse/goldi",
                 "type": "git",
                 "version": "branch:master"
+            },
+            {
+                "name": "gopkg.in/yaml.v2",
+                "type": "git",
+                "version": "branch:master"
             }
         ]
     },

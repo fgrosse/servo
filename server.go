@@ -2,19 +2,28 @@ package servo
 
 import "net/http"
 
+// The Server is responsible for running the server process.
+// It can be injected via the goldi type "kernel.server"
 type Server interface {
+	// Run starts the server and blocks until it has finished
 	Run() error
 }
 
-type DefaultServer struct {
+// DefaultServer is the standard implementation of the Server interface.
+// It accepts a listen address and an HTTP handler and uses the http package of
+// the standard library.
+type HTTPServer struct {
 	ListenAddress string
 	Handler       http.Handler
 }
 
-func NewDefaultServer(listenAddress string, handler http.Handler) *DefaultServer {
-	return &DefaultServer{listenAddress, handler}
+// NewHTTPServer creates a new HTTPServer
+func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
+	return &HTTPServer{listenAddress, handler}
 }
 
-func (s *DefaultServer) Run() error {
+// Run will make this server listen on the given ListenAddress and use the handler to
+// handle all incoming HTTP requests. The method blocks.
+func (s *HTTPServer) Run() error {
 	return http.ListenAndServe(s.ListenAddress, s.Handler)
 }

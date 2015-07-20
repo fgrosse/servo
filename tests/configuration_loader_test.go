@@ -5,17 +5,17 @@ import (
 	. "github.com/onsi/gomega"
 
 	"fmt"
-	"github.com/fgrosse/goku/vendor/src/gopkg.in/yaml.v2"
 	"github.com/fgrosse/servo"
+	"github.com/fgrosse/servo/configuration"
 )
 
 var _ = Describe("Build in configuration loaders", func() {
 
 	Describe("ConfigurationFileLoader", func() {
-		var config *servo.ConfigurationFileLoader
+		var config *configuration.FileLoader
 
 		BeforeEach(func() {
-			config = servo.NewConfigurationFileLoader("fixtures/config.yml", yaml.Unmarshal)
+			config = configuration.NewYAMLFileLoader("fixtures/config.yml")
 		})
 
 		Describe("Load", func() {

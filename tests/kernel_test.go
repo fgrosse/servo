@@ -6,16 +6,17 @@ import (
 
 	"github.com/fgrosse/servo"
 	"github.com/fgrosse/servo/tests/testAPI"
+	"github.com/fgrosse/servo/configuration"
 )
 
 var _ = Describe("Kernel", func() {
 	var (
-		config *servo.MemoryConfigurationLoader
+		config *configuration.MemoryLoader
 		kernel *servo.Kernel
 	)
 
 	BeforeEach(func() {
-		config = servo.NewMemoryConfigurationLoader()
+		config = configuration.NewMemoryLoader()
 		kernel = servo.NewKernel(config)
 	})
 

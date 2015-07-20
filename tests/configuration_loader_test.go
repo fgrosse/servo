@@ -5,7 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"fmt"
-	"github.com/fgrosse/servo"
 	"github.com/fgrosse/servo/configuration"
 )
 
@@ -40,27 +39,6 @@ var _ = Describe("Build in configuration loaders", func() {
 				Expect(data).To(HaveKeyWithValue("foo", "value1"))
 				Expect(data).To(HaveKeyWithValue("bar", "value2"))
 			})
-		})
-	})
-
-	Describe("ConfigurationFlattener", func() {
-		It("It should flatten all configuration parameters", func() {
-			data := map[string]interface{}{
-				"nested": map[string]interface{}{
-					"foo": map[string]interface{}{
-						"value": "nested value 1",
-					},
-					"bar": map[string]interface{}{
-						"value": "nested value 2",
-					},
-				},
-			}
-
-			flattener := servo.NewConfigurationFlattener()
-			data = flattener.Flatten(data)
-
-			Expect(data).To(HaveKeyWithValue("nested.foo.value", "nested value 1"))
-			Expect(data).To(HaveKeyWithValue("nested.bar.value", "nested value 2"))
 		})
 	})
 })

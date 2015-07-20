@@ -44,15 +44,32 @@ func (k *Kernel) Run() error {
 func (k *Kernel) createContainer() (*goldi.Container, error) {
 	// TODO defer panic handler for validateContainer (maybe change in goldi)
 	config, err := k.Config.Load()
-
 	if err != nil {
 		return nil, err
 	}
 
-	container := goldi.NewContainer(k.TypeRegistry, config)
+	flattenedConfig := map[string]interface{}{}
+	k.flatten("", config, flattenedConfig)
+
+	container := goldi.NewContainer(k.TypeRegistry, flattenedConfig)
 	k.validateContainer(container)
 
 	return container, nil
+}
+
+func (k *Kernel) flatten(key string, value interface{}, m map[string]interface{}) {
+	switch x := value.(type) {
+	case map[string]interface{}:
+		for childKey, childValue := range x {
+			newKey := childKey
+			if key != "" {
+				newKey = key + "." + childKey
+			}
+			k.flatten(newKey, childValue, m)
+		}
+	default:
+		m[key] = value
+	}
 }
 
 func (k *Kernel) validateContainer(container *goldi.Container) {

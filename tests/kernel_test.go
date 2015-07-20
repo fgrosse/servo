@@ -5,8 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/fgrosse/servo"
-	"github.com/fgrosse/servo/tests/testAPI"
 	"github.com/fgrosse/servo/configuration"
+	"github.com/fgrosse/servo/tests/testAPI"
 )
 
 var _ = Describe("Kernel", func() {
@@ -45,8 +45,26 @@ var _ = Describe("Kernel", func() {
 			kernel.Run()
 		})
 
-		PIt("It should validate the container", func() {
-			// TODO
+		It("It should flatten all configuration parameters", func() {
+			config.SetAll(map[string]interface{}{
+				"nested": map[string]interface{}{
+					"foo": map[string]interface{}{
+						"value": "foo",
+					},
+					"bar": map[string]interface{}{
+						"value": "bar",
+					},
+				},
+			})
+
+			kernel.RegisterType("kernel.server", testAPI.NewServerMockWithParams, "%nested.foo.value%", "%nested.bar.value%")
+			kernel.Run()
+		})
+
+		It("It should validate the container", func() {
+			kernel.RegisterType("some.service", testAPI.NewRecursiveSerice, "@other.service")
+			kernel.RegisterType("other.service", testAPI.NewRecursiveSerice, "@some.service")
+			Expect(func() { kernel.Run() }).To(Panic(), "should panic because we have a dependency cycle in the container")
 		})
 
 		It("It should use the kernel.server type to run the server", func() {

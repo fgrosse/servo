@@ -15,15 +15,17 @@ type Server interface {
 type HTTPServer struct {
 	ListenAddress string
 	Handler       http.Handler
+	Log           Logger
 }
 
 // NewHTTPServer creates a new HTTPServer
-func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
-	return &HTTPServer{listenAddress, handler}
+func NewHTTPServer(listenAddress string, handler http.Handler, log Logger) *HTTPServer {
+	return &HTTPServer{listenAddress, handler, log}
 }
 
 // Run will make this server listen on the given ListenAddress and use the handler to
 // handle all incoming HTTP requests. The method blocks.
 func (s *HTTPServer) Run() error {
+	s.Log.Info("Server started", "address", s.ListenAddress)
 	return http.ListenAndServe(s.ListenAddress, s.Handler)
 }

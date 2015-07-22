@@ -1,15 +1,17 @@
 package servo
 
 import (
-	"fmt"
-
 	"github.com/fgrosse/goldi"
+	"github.com/fgrosse/servo/configuration"
 )
+
+var KernelVersion = "unknown"
 
 // The Kernel is basically a goldi.TypeRegistry on which all necessary types are registered.
 // Once type registration is done it is started with its Run function.
 type Kernel struct {
 	goldi.TypeRegistry
+	Log       Logger
 	Config    ConfigurationLoader
 	Validator *goldi.ContainerValidator
 }
@@ -20,6 +22,7 @@ type Kernel struct {
 func NewKernel(config ConfigurationLoader) *Kernel {
 	kernel := &Kernel{
 		TypeRegistry: goldi.NewTypeRegistry(),
+		Log:          NewNullLogger(),
 		Config:       config,
 		Validator:    goldi.NewContainerValidator(),
 	}
@@ -28,10 +31,15 @@ func NewKernel(config ConfigurationLoader) *Kernel {
 	return kernel
 }
 
+func (k *Kernel) Register(bundle Bundle) {
+	bundle.Boot(k)
+}
+
 // Run creates a goldi.Container based on the TypeRegistry of the kernel and used the configuration loader.
 // It does then instantiate the "kernel.server" type and calls Run on the resulting Server implementation.
 // This method blocks until the server returns from Run.
 func (k *Kernel) Run() error {
+	k.Log.Info("Starting servo kernel", "version", KernelVersion)
 	container, err := k.createContainer()
 	if err != nil {
 		return err
@@ -42,41 +50,34 @@ func (k *Kernel) Run() error {
 }
 
 func (k *Kernel) createContainer() (*goldi.Container, error) {
-	// TODO defer panic handler for validateContainer (maybe change in goldi)
+	k.Log.Debug("Loading the configuration..")
 	config, err := k.Config.Load()
 	if err != nil {
 		return nil, err
 	}
+	k.Log.Debug("Finished loading of the configuration")
 
-	flattenedConfig := map[string]interface{}{}
-	k.flatten("", config, flattenedConfig)
+	k.Log.Debug("Flattening the configuration..")
+	flattenedConfig := new(configuration.Flattener).Flatten(config)
+	k.Log.Debug("Configuration has been loaded and flattened", "config", flattenedConfig)
 
+	k.Log.Debug("Creating goldi container")
 	container := goldi.NewContainer(k.TypeRegistry, flattenedConfig)
-	k.validateContainer(container)
+	container.InjectInstance("logger", k.Log)
 
-	return container, nil
-}
-
-func (k *Kernel) flatten(key string, value interface{}, m map[string]interface{}) {
-	switch x := value.(type) {
-	case map[string]interface{}:
-		for childKey, childValue := range x {
-			newKey := childKey
-			if key != "" {
-				newKey = key + "." + childKey
-			}
-			k.flatten(newKey, childValue, m)
-		}
-	default:
-		m[key] = value
+	err = k.validateContainer(container)
+	if err != nil {
+		k.Log.Error("Container is invalid", "error", err)
+	} else {
+		k.Log.Debug("Container passed validation")
 	}
+
+	return container, err
 }
 
-func (k *Kernel) validateContainer(container *goldi.Container) {
+func (k *Kernel) validateContainer(container *goldi.Container) error {
+	k.Log.Debug("Validating container")
 	// TODO add explicit type checks for all internal types that might have gotten overwritten
 
-	err := k.Validator.Validate(container)
-	if err != nil {
-		panic(fmt.Errorf("container validation error: %s", err))
-	}
+	return k.Validator.Validate(container)
 }

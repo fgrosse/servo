@@ -22,6 +22,26 @@
                 "name": "gopkg.in/yaml.v2",
                 "type": "git",
                 "version": "branch:master"
+            },
+            {
+                "name": "github.com/mgutz/logxi",
+                "type": "git",
+                "version": "branch:master"
+            },
+            {
+                "name": "github.com/mattn/go-colorable",
+                "type": "git",
+                "version": "branch:master"
+            },
+            {
+                "name": "github.com/mgutz/ansi",
+                "type": "git",
+                "version": "branch:master"
+            },
+            {
+                "name": "github.com/mattn/go-isatty",
+                "type": "git",
+                "version": "branch:master"
             }
         ]
     },

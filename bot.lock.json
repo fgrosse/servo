@@ -18,7 +18,7 @@
             "name": "github.com/fgrosse/goldi",
             "source": {
                 "type": "git",
-                "version": "4cacccbf490b4d5878f3cee672c65116e1541232"
+                "version": "161f15245f2ba74fe153c2f4a094c1ea025b839f"
             }
         },
         {
@@ -40,6 +40,34 @@
             "source": {
                 "type": "git",
                 "version": "6b4e7dc5e3143b85ea77909c72caf89416fc2915"
+            }
+        },
+        {
+            "name": "github.com/mgutz/logxi",
+            "source": {
+                "type": "git",
+                "version": "14b2337527a960f31ed8b9481f3e5665246708cd"
+            }
+        },
+        {
+            "name": "github.com/mattn/go-colorable",
+            "source": {
+                "type": "git",
+                "version": "40e4aedc8fabf8c23e040057540867186712faa5"
+            }
+        },
+        {
+            "name": "github.com/mgutz/ansi",
+            "source": {
+                "type": "git",
+                "version": "452f5f5396543168418a299cd963697ac742b56e"
+            }
+        },
+        {
+            "name": "github.com/mattn/go-isatty",
+            "source": {
+                "type": "git",
+                "version": "ae0b1f8f8004be68d791a576e3d8e7648ab41449"
             }
         }
     ]

@@ -30,6 +30,17 @@ var _ = Describe("Kernel", func() {
 		})
 	})
 
+	Describe("Registering bundles", func() {
+		It("It should register all types of the bundle", func() {
+			kernel.Register(new(testAPI.TestBundle))
+			Expect(kernel.TypeRegistry).To(HaveKey("test_bundle.my_type"))
+		})
+
+		PIt("It load the bundle configuration", func() {
+
+		})
+	})
+
 	Describe("Run", func() {
 		var server *testAPI.ServerMock
 
@@ -42,33 +53,33 @@ var _ = Describe("Kernel", func() {
 			kernel.RegisterType("kernel.server", testAPI.NewServerMockWithParams, "%foo%", "%bar%")
 			config.Set("foo", "foo")
 			config.Set("bar", "bar")
-			kernel.Run()
+			Expect(kernel.Run()).To(Succeed())
 		})
 
 		It("It should flatten all configuration parameters", func() {
 			config.SetAll(map[string]interface{}{
-				"nested": map[string]interface{}{
-					"foo": map[string]interface{}{
+				"nested": map[interface{}]interface{}{
+					"foo": map[interface{}]interface{}{
 						"value": "foo",
 					},
-					"bar": map[string]interface{}{
+					"bar": map[interface{}]interface{}{
 						"value": "bar",
 					},
 				},
 			})
 
 			kernel.RegisterType("kernel.server", testAPI.NewServerMockWithParams, "%nested.foo.value%", "%nested.bar.value%")
-			kernel.Run()
+			Expect(kernel.Run()).To(Succeed())
 		})
 
 		It("It should validate the container", func() {
-			kernel.RegisterType("some.service", testAPI.NewRecursiveSerice, "@other.service")
-			kernel.RegisterType("other.service", testAPI.NewRecursiveSerice, "@some.service")
-			Expect(func() { kernel.Run() }).To(Panic(), "should panic because we have a dependency cycle in the container")
+			kernel.RegisterType("some.service", testAPI.NewRecursiveService, "@other.service")
+			kernel.RegisterType("other.service", testAPI.NewRecursiveService, "@some.service")
+			Expect(kernel.Run()).NotTo(Succeed(), "should return an error because we have a dependency cycle in the container")
 		})
 
 		It("It should use the kernel.server type to run the server", func() {
-			kernel.Run()
+			Expect(kernel.Run()).To(Succeed())
 			Expect(server.RunHasBeenCalled).To(BeTrue())
 		})
 

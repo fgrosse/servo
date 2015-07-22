@@ -1,3 +1,5 @@
 vendor
 *.coverprofile
 .idea
+
+example/server

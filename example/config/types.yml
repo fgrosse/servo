@@ -2,5 +2,3 @@ types:
     kernel.http_handler:
         package: github.com/fgrosse/servo/example
         type:    MySimpleHandler
-        factory: NewMySimpleHandler
-        # TODO implement generating types without factory in goldigen (goldi already supports this)

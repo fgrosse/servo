@@ -1,2 +1,5 @@
 servo:
     listen: 0.0.0.0:3000
+
+logxi:
+    format: happy # valid values are "happy", "text", "JSON", "LTSV"

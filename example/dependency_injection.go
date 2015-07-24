@@ -10,5 +10,5 @@ import (
 // It is however good practice to put this file under version control.
 // See https://github.com/FGrosse/goldi for what is going on here.
 func RegisterTypes(types goldi.TypeRegistry) {
-	types.RegisterType("kernel.http_handler", NewMySimpleHandler)
+	types.RegisterType("kernel.http_handler", MySimpleHandler{})
 }

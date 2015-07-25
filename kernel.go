@@ -13,7 +13,6 @@ type Kernel struct {
 	goldi.TypeRegistry
 	Log       Logger
 	Config    ConfigurationLoader
-	Validator *goldi.ContainerValidator
 }
 
 // NewKernel creates a new kernel.
@@ -24,7 +23,6 @@ func NewKernel(config ConfigurationLoader) *Kernel {
 		TypeRegistry: goldi.NewTypeRegistry(),
 		Log:          NewNullLogger(),
 		Config:       config,
-		Validator:    goldi.NewContainerValidator(),
 	}
 
 	registerInternalTypes(kernel.TypeRegistry)
@@ -55,14 +53,14 @@ func (k *Kernel) createContainer() (*goldi.Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	k.Log.Debug("Finished loading of the configuration")
 
-	k.Log.Debug("Flattening the configuration..")
+	k.Log.Trace("Flattening the configuration..")
 	flattenedConfig := new(configuration.Flattener).Flatten(config)
-	k.Log.Debug("Configuration has been loaded and flattened", "config", flattenedConfig)
+	k.Log.Debug("Configuration has been loaded", "config", flattenedConfig)
 
 	k.Log.Debug("Creating goldi container")
 	container := goldi.NewContainer(k.TypeRegistry, flattenedConfig)
+	container.InjectInstance("container", container)
 	container.InjectInstance("logger", k.Log)
 
 	err = k.validateContainer(container)
@@ -75,9 +73,13 @@ func (k *Kernel) createContainer() (*goldi.Container, error) {
 	return container, err
 }
 
-func (k *Kernel) validateContainer(container *goldi.Container) error {
-	k.Log.Debug("Validating container")
-	// TODO add explicit type checks for all internal types that might have gotten overwritten
+const TypeContainerValidator = "container.validator"
 
-	return k.Validator.Validate(container)
+func (k *Kernel) validateContainer(container *goldi.Container) error {
+	k.Log.Trace("Retrieving validator from container", "service_name", TypeContainerValidator)
+	validator := container.Get(TypeContainerValidator).(*goldi.ContainerValidator)
+
+	k.Log.Debug("Validating container")
+
+	return validator.Validate(container)
 }

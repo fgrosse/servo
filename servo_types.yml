@@ -8,6 +8,11 @@ types:
             - "@kernel.http_handler" # this type must be registered by the application
             - "@logger"
 
+    container.validator:
+        package: github.com/fgrosse/goldi
+        type:    ContainerValidator
+        factory: NewContainerValidator
+
     logger:
         package: github.com/fgrosse/servo
         type:    Logger

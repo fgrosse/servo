@@ -1,4 +1,4 @@
 types:
     kernel.http_handler:
         package: github.com/fgrosse/servo/example
-        type:    MySimpleHandler
+        func:    ServeHTTP

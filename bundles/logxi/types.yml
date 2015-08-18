@@ -1,0 +1,14 @@
+types:
+    logger:
+        package: github.com/mgutz/logxi/v1
+        package-name: log
+        type:    Logger
+        factory: New
+        arguments: [ "servo" ]
+        configurator: [ "@logxi.configurator", Configure ]
+
+    logxi.configurator:
+        package: github.com/fgrosse/servo/bundles/logxi
+        factory: NewLoggerConfigurator
+        arguments:
+            - "%logxi.level%"

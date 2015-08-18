@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	config := configuration.NewYAMLFileLoader("config/config.yml")
-	kernel := servo.NewKernel(config)
+	loader := configuration.NewYAMLFileLoader("config/config.yml")
+	kernel := servo.NewDebugKernel(loader)
 	kernel.Register(new(logxi.Bundle))
 
 	example.RegisterTypes(kernel.TypeRegistry)

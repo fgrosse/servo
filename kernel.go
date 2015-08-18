@@ -54,7 +54,7 @@ func (k *Kernel) Run() error {
 		return err
 	}
 
-	server := container.Get("kernel.server").(Server)
+	server := container.Get("kernel.http.server").(Server)
 	return server.Run()
 }
 

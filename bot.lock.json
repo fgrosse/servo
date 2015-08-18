@@ -69,6 +69,20 @@
                 "type": "git",
                 "version": "ae0b1f8f8004be68d791a576e3d8e7648ab41449"
             }
+        },
+        {
+            "name": "github.com/gorilla/mux",
+            "source": {
+                "type": "git",
+                "version": "f8220e087da2fc83d083bfc0289ed7f9db3536bd"
+            }
+        },
+        {
+            "name": "github.com/gorilla/context",
+            "source": {
+                "type": "git",
+                "version": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+            }
         }
     ]
 }

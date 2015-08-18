@@ -1,0 +1,13 @@
+{
+    "bot-version": "none",
+    "dependency": {
+        "folder": "vendor",
+        "packages": [
+            {
+                "name": "github.com/gorilla/mux",
+                "type": "git",
+                "version": "branch:master"
+            }
+        ]
+    }
+}

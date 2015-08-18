@@ -12,6 +12,6 @@ import (
 // See https://github.com/fgrosse/goldi for what is going on here.
 func registerInternalTypes(types goldi.TypeRegistry) {
 	types.Register("container.validator", goldi.NewType(goldi.NewContainerValidator))
-	types.Register("kernel.server", goldi.NewType(NewHTTPServer, "%servo.listen%", "@kernel.http_handler", "@logger"))
+	types.Register("kernel.http.server", goldi.NewType(NewHTTPServer, "%servo.listen%", "@kernel.http_handler", "@logger"))
 	types.Register("logger", goldi.NewType(NewNullLogger))
 }

@@ -1,0 +1,11 @@
+{
+    "packages": [
+        {
+            "name": "github.com/gorilla/mux",
+            "source": {
+                "type": "git",
+                "version": "f8220e087da2fc83d083bfc0289ed7f9db3536bd"
+            }
+        }
+    ]
+}

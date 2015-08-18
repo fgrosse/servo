@@ -1,0 +1,15 @@
+types:
+    servo.routing.loader:
+        package: github.com/fgrosse/servo/bundles/routing
+        type:    Loader
+
+    servo.routing.router:
+        package: github.com/fgrosse/servo/bundles/routing
+        type:    http.Handler
+        factory: NewRouter
+        arguments:
+            - "@servo.routing.loader"
+            - "@container"
+
+    kernel.http_handler:
+        alias: "@servo.routing.router" #TODO maybe setup in bundle load instead

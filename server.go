@@ -14,12 +14,12 @@ type Server interface {
 // the standard library.
 type HTTPServer struct {
 	ListenAddress string
-	Handler       http.HandlerFunc
+	Handler       http.Handler
 	Log           Logger
 }
 
 // NewHTTPServer creates a new HTTPServer
-func NewHTTPServer(listenAddress string, handler http.HandlerFunc, log Logger) *HTTPServer {
+func NewHTTPServer(listenAddress string, handler http.Handler, log Logger) *HTTPServer {
 	return &HTTPServer{listenAddress, handler, log}
 }
 
@@ -27,6 +27,6 @@ func NewHTTPServer(listenAddress string, handler http.HandlerFunc, log Logger) *
 // handle all incoming HTTP requests. The method blocks.
 func (s *HTTPServer) Run() error {
 	s.Log.Info("Server started", "address", s.ListenAddress)
-	http.HandleFunc("/", s.Handler)
+	http.Handle("/", s.Handler)
 	return http.ListenAndServe(s.ListenAddress, s.Handler)
 }

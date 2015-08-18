@@ -1,4 +1,8 @@
 types:
-    kernel.http_handler:
-        package: github.com/fgrosse/servo/example
-        func:    ServeHTTP
+    hello_world_endpoint:
+        package: github.com/fgrosse/servo/example/endpoints
+        func:    HelloWorldEndpoint
+
+    greet_user_endpoint:
+        package: github.com/fgrosse/servo/example/endpoints
+        func:    GreetUserEndpoint

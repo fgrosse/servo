@@ -1,5 +1,5 @@
 types:
-    kernel.server:
+    kernel.http.server:
         package: github.com/fgrosse/servo
         type:    Server
         factory: NewHTTPServer

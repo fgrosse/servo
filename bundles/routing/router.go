@@ -14,8 +14,7 @@ func NewRouter(loader *Loader, container *goldi.Container) http.Handler {
 
 	r := mux.NewRouter()
 	for _, route := range routes {
-		endpointTypeID := route.EndpointTypeID[1:]
-		handler := container.Get(endpointTypeID).(func(http.ResponseWriter, *http.Request)) // TODO check if endpointTypeID is a valid type ID
+		handler := container.Get(route.EndpointTypeID).(func(http.ResponseWriter, *http.Request))
 		r.HandleFunc(route.Path, handler)
 	}
 

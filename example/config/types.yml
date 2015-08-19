@@ -1,4 +1,23 @@
 types:
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # Oridnary type definitions:             #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    my_controller:
+        package: github.com/fgrosse/servo/example/endpoints
+        type:    FancyController
+        arguments:
+            - "@my_service_client"
+
+    my_service_client:
+        package: github.com/fgrosse/servo/example/lib
+        type:    ServiceClient # TODO introduce some semantic for guaranteeing an interface for defined types
+        factory: NewMockServiceClient
+        arguments:
+            - "%my_app.some_parameter%"
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # Endpoints that are used by the router: #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     hello_world_endpoint:
         package: github.com/fgrosse/servo/example/endpoints
         func:    HelloWorldEndpoint
@@ -6,3 +25,10 @@ types:
     greet_user_endpoint:
         package: github.com/fgrosse/servo/example/endpoints
         func:    GreetUserEndpoint
+
+    controller_endpoint:
+        package: github.com/fgrosse/servo/example/endpoints
+        func:    "@my_controller::FancyAction"
+
+    #foo:
+    #    package: github.com/fgrosse/servo

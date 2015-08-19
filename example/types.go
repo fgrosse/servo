@@ -1,9 +1,10 @@
-//go:generate goldigen --in "config/types.yml" --out "dependency_injection.go" --package github.com/fgrosse/servo/example --function RegisterTypes --overwrite --nointeraction
-package example
+//go:generate goldigen --in "config/types.yml" --out "types.go" --package github.com/fgrosse/servo/main --function RegisterTypes --overwrite --nointeraction
+package main
 
 import (
 	"github.com/fgrosse/goldi"
 	"github.com/fgrosse/servo/example/endpoints"
+	"github.com/fgrosse/servo/example/lib"
 )
 
 // RegisterTypes registers all types that have been defined in the file "config/types.yml"
@@ -12,6 +13,9 @@ import (
 // It is however good practice to put this file under version control.
 // See https://github.com/fgrosse/goldi for what is going on here.
 func RegisterTypes(types goldi.TypeRegistry) {
+	types.Register("controller_endpoint", goldi.NewFuncReferenceType("my_controller", "FancyAction"))
 	types.Register("greet_user_endpoint", goldi.NewFuncType(endpoints.GreetUserEndpoint))
 	types.Register("hello_world_endpoint", goldi.NewFuncType(endpoints.HelloWorldEndpoint))
+	types.Register("my_controller", goldi.NewStructType(new(endpoints.FancyController), "@my_service_client"))
+	types.Register("my_service_client", goldi.NewType(lib.NewMockServiceClient, "%my_app.some_parameter%"))
 }

@@ -1,7 +1,8 @@
-homepage:
-    path:     /
-    endpoint: "@hello_world_endpoint"
+hello_world_endpoint:
+    path: /
 
-greet_user:
-    path:     /hello/{name}
-    endpoint: "@greet_user_endpoint" # the default service name is @route_name_endpoint
+greet_user_endpoint:
+    path: /hello/{name}
+
+controller_endpoint:
+    path: /controller

@@ -12,4 +12,4 @@ types:
             - "@container"
 
     kernel.http_handler:
-        alias: "@servo.routing.router" #TODO maybe setup in bundle load instead
+        alias: "@servo.routing.router"

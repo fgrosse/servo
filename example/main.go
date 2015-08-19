@@ -5,9 +5,8 @@ import (
 
 	"github.com/fgrosse/servo"
 	"github.com/fgrosse/servo/bundles/logxi"
-	"github.com/fgrosse/servo/configuration"
-	"github.com/fgrosse/servo/example"
 	"github.com/fgrosse/servo/bundles/routing"
+	"github.com/fgrosse/servo/configuration"
 )
 
 func main() {
@@ -16,7 +15,7 @@ func main() {
 	kernel.Register(new(logxi.Bundle))
 	kernel.Register(new(routing.Bundle))
 
-	example.RegisterTypes(kernel.TypeRegistry)
+	RegisterTypes(kernel.TypeRegistry)
 	err := kernel.Run()
 	if err != nil {
 		log.Fatal(err)

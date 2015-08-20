@@ -5,15 +5,20 @@ types:
         factory: NewHTTPServer
         arguments:
             - "%servo.listen%"
-            - "@kernel.http_handler" # this type must be registered by the application
-            - "@logger"
+            - @kernel.http_handler # this type must be registered by the application (TODO add check)
+            - @logger
 
     container.validator:
-        package: github.com/fgrosse/goldi
+        package: github.com/fgrosse/goldi/validation
         type:    ContainerValidator
         factory: NewContainerValidator
 
+    logger_provider:
+        package:   github.com/fgrosse/servo
+        interface: LoggerProvider
+        type:      NullLoggerProvider
+
     logger:
-        package: github.com/fgrosse/servo
-        type:    Logger
-        factory: NewNullLogger
+        interface: Logger
+        factory:   @logger_provider::GetLogger
+        args:      [ servo ]

@@ -6,3 +6,9 @@ greet_user_endpoint:
 
 controller_endpoint:
     path: /controller
+
+composed_endpoint:
+    path: /composed
+
+container_aware_endpoint:
+    path: /container

@@ -5,15 +5,27 @@ types:
     my_controller:
         package: github.com/fgrosse/servo/example/endpoints
         type:    FancyController
-        arguments:
-            - "@my_service_client"
+        args:
+            - @my_service_client
 
     my_service_client:
         package: github.com/fgrosse/servo/example/lib
         type:    ServiceClient # TODO introduce some semantic for guaranteeing an interface for defined types
         factory: NewMockServiceClient
-        arguments:
+        args:
             - "%my_app.some_parameter%"
+
+    my_logger:
+        factory: "@logger_provider::GetLogger"
+        args:    [ my_app ]
+        calls: # TODO implement this in goldi
+            - [ SetLevel, [ 10 ] ] # 10 = LevelTrace
+
+    my_container_aware_controller:
+        package: github.com/fgrosse/servo/example/endpoints
+        type:    ContainerAwareController
+        args:
+            - @container
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Endpoints that are used by the router: #
@@ -27,8 +39,33 @@ types:
         func:    GreetUserEndpoint
 
     controller_endpoint:
-        package: github.com/fgrosse/servo/example/endpoints
-        func:    "@my_controller::FancyAction"
+        func:    @my_controller::FancyAction
 
-    #foo:
-    #    package: github.com/fgrosse/servo
+    container_aware_endpoint:
+        func:    @my_container_aware_controller::SomeAction
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # Endpoints can also be composed:        #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    composed_endpoint:
+        package: github.com/fgrosse/servo/handler
+        factory: Composed
+        args:
+            - @my_controller::OuterHandlerAction
+            - @my_controller::SecondHandlerAction
+            - @my_controller::FancyAction
+
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    # Define our own http middleware chain   #
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+    my_app.logging_adapter:
+        package: github.com/fgrosse/servo/middleware
+        factory: LoggingAdapter
+        args:    [ @my_logger ]
+
+    kernel.http_handler:
+        package: github.com/fgrosse/servo/handler
+        factory: MiddleWareAdapter
+        args:
+            - @servo.routing.router
+            - @my_app.logging_adapter

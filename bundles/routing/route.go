@@ -1,6 +1,6 @@
 package routing
 
 type Route struct {
-	EndpointTypeID string `yaml:"-"`
+	EndpointTypeID string `yaml:"endpoint"`
 	Path           string `yaml:"path"`
 }

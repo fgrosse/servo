@@ -24,11 +24,16 @@ type Logger interface {
 	// Error, Fatal not needed, those SHOULD always be logged
 }
 
-type NullLogger struct {}
+// LoggerProvider is the interface to retrieve a new Logger.
+type LoggerProvider interface {
 
-func NewNullLogger() *NullLogger {
-	return &NullLogger{}
+	// GetLogger should return a logger by name.
+	// The returned logger may have been cached
+	GetLogger(name string) Logger
 }
+
+// NullLogger is a null implementation of the Logger interface
+type NullLogger struct {}
 
 func (l *NullLogger) Trace(msg string, args ...interface{}) {}
 func (l *NullLogger) Debug(msg string, args ...interface{}) {}
@@ -42,3 +47,10 @@ func (l *NullLogger) IsTrace() bool { return false }
 func (l *NullLogger) IsDebug() bool { return false }
 func (l *NullLogger) IsInfo() bool { return false }
 func (l *NullLogger) IsWarn() bool { return false }
+
+// NullLoggerProvider is a null implementation of the LoggerProvider interface
+type NullLoggerProvider struct {}
+
+func (p *NullLoggerProvider) GetLogger(_ string) Logger {
+	return new(NullLogger)
+}

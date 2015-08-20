@@ -1,14 +1,15 @@
 types:
-    logger:
-        package: github.com/mgutz/logxi/v1
-        package-name: log
-        type:    Logger
-        factory: New
-        arguments: [ "servo" ]
-        configurator: [ "@logxi.configurator", Configure ]
+    logxi.logger_provider:
+        package: github.com/fgrosse/servo/bundles/logxi
+        type:    LoggerProvider
+        configurator: [ @logxi.configurator, Configure ]
 
     logxi.configurator:
         package: github.com/fgrosse/servo/bundles/logxi
         factory: NewLoggerConfigurator
         arguments:
             - "%logxi.level%"
+
+    # register ourselfes as the logger for servo
+    logger_provider:
+        alias: logxi.logger_provider

@@ -5,6 +5,7 @@ import (
 	"github.com/fgrosse/servo/configuration"
 	"github.com/mgutz/logxi/v1"
 	"fmt"
+	"github.com/fgrosse/goldi/validation"
 )
 
 var KernelVersion = "unknown"
@@ -24,7 +25,7 @@ func NewKernel(config ConfigurationLoader) *Kernel {
 	kernel := &Kernel{
 		TypeRegistry: goldi.NewTypeRegistry(),
 		Config:       config,
-		log:          NewNullLogger(),
+		log:          new(NullLogger),
 	}
 
 	registerInternalTypes(kernel.TypeRegistry)
@@ -54,8 +55,12 @@ func (k *Kernel) Run() error {
 		return err
 	}
 
-	server := container.Get("kernel.http.server").(Server)
-	return server.Run()
+	server, err := container.Get("kernel.http.server")
+	if err != nil {
+		k.log.Fatal(err.Error())
+	}
+
+	return server.(Server).Run()
 }
 
 func (k *Kernel) createContainer() (*goldi.Container, error) {
@@ -87,9 +92,12 @@ const TypeContainerValidator = "container.validator"
 
 func (k *Kernel) validateContainer(container *goldi.Container) error {
 	k.log.Trace("Retrieving validator from container", "service_name", TypeContainerValidator)
-	validator := container.Get(TypeContainerValidator).(*goldi.ContainerValidator)
+	validator, err := container.Get(TypeContainerValidator)
+	if err != nil {
+		k.log.Fatal(err.Error())
+	}
 
 	k.log.Debug("Validating container")
 
-	return validator.Validate(container)
+	return validator.(*validation.ContainerValidator).Validate(container)
 }

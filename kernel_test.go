@@ -1,4 +1,4 @@
-package tests
+package servo_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/fgrosse/servo"
 	"github.com/fgrosse/servo/configuration"
-	"github.com/fgrosse/servo/tests/testAPI"
 )
 
 var _ = Describe("Kernel", func() {
@@ -26,13 +25,13 @@ var _ = Describe("Kernel", func() {
 		})
 
 		It("It should register all internal types", func() {
-			Expect(kernel.TypeRegistry).To(HaveKey("kernel.server"))
+			Expect(kernel.TypeRegistry).To(HaveKey("kernel.http.server"))
 		})
 	})
 
 	Describe("Registering bundles", func() {
 		It("It should register all types of the bundle", func() {
-			kernel.Register(new(testAPI.TestBundle))
+			kernel.Register(new(TestBundle))
 			Expect(kernel.TypeRegistry).To(HaveKey("test_bundle.my_type"))
 		})
 
@@ -42,15 +41,16 @@ var _ = Describe("Kernel", func() {
 	})
 
 	Describe("Run", func() {
-		var server *testAPI.ServerMock
+		var server *ServerMock
 
 		BeforeEach(func() {
-			server = new(testAPI.ServerMock)
-			kernel.InjectInstance("kernel.server", server)
+			server = new(ServerMock)
+			kernel.InjectInstance("kernel.http.server", server)
+			config.Set("servo.listen", "0.0.0.0:3000")
 		})
 
 		It("It should load the configuration", func() {
-			kernel.RegisterType("kernel.server", testAPI.NewServerMockWithParams, "%foo%", "%bar%")
+			kernel.RegisterType("kernel.http.server", NewServerMockWithParams, "%foo%", "%bar%")
 			config.Set("foo", "foo")
 			config.Set("bar", "bar")
 			Expect(kernel.Run()).To(Succeed())
@@ -68,17 +68,17 @@ var _ = Describe("Kernel", func() {
 				},
 			})
 
-			kernel.RegisterType("kernel.server", testAPI.NewServerMockWithParams, "%nested.foo.value%", "%nested.bar.value%")
+			kernel.RegisterType("kernel.http.server", NewServerMockWithParams, "%nested.foo.value%", "%nested.bar.value%")
 			Expect(kernel.Run()).To(Succeed())
 		})
 
 		It("It should validate the container", func() {
-			kernel.RegisterType("some.service", testAPI.NewRecursiveService, "@other.service")
-			kernel.RegisterType("other.service", testAPI.NewRecursiveService, "@some.service")
+			kernel.RegisterType("some.service", NewRecursiveService, "@other.service")
+			kernel.RegisterType("other.service", NewRecursiveService, "@some.service")
 			Expect(kernel.Run()).NotTo(Succeed(), "should return an error because we have a dependency cycle in the container")
 		})
 
-		It("It should use the kernel.server type to run the server", func() {
+		It("It should use the kernel.http.server type to run the server", func() {
 			Expect(kernel.Run()).To(Succeed())
 			Expect(server.RunHasBeenCalled).To(BeTrue())
 		})

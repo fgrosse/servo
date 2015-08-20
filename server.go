@@ -10,16 +10,14 @@ type Server interface {
 }
 
 // DefaultServer is the standard implementation of the Server interface.
-// It accepts a listen address and an HTTP handler and uses the http package of
-// the standard library.
 type HTTPServer struct {
 	ListenAddress string
-	Handler       http.Handler
+	HandlerFunc   http.HandlerFunc
 	Log           Logger
 }
 
 // NewHTTPServer creates a new HTTPServer
-func NewHTTPServer(listenAddress string, handler http.Handler, log Logger) *HTTPServer {
+func NewHTTPServer(listenAddress string, handler http.HandlerFunc, log Logger) *HTTPServer {
 	return &HTTPServer{listenAddress, handler, log}
 }
 
@@ -27,6 +25,6 @@ func NewHTTPServer(listenAddress string, handler http.Handler, log Logger) *HTTP
 // handle all incoming HTTP requests. The method blocks.
 func (s *HTTPServer) Run() error {
 	s.Log.Info("Server started", "address", s.ListenAddress)
-	http.Handle("/", s.Handler)
-	return http.ListenAndServe(s.ListenAddress, s.Handler)
+	http.HandleFunc("/", s.HandlerFunc)
+	return http.ListenAndServe(s.ListenAddress, nil)
 }

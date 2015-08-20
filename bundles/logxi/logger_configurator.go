@@ -20,6 +20,10 @@ func NewLoggerConfigurator(levelString string) *LoggerConfigurator {
 	return &LoggerConfigurator{level}
 }
 
-func (c *LoggerConfigurator) Configure(logger log.Logger) {
-	logger.SetLevel(c.Level)
+type configurable interface {
+	SetLevel(int)
+}
+
+func (c *LoggerConfigurator) Configure(t configurable) {
+	t.SetLevel(c.Level)
 }

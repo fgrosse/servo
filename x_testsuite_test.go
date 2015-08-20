@@ -1,10 +1,39 @@
-package testAPI
+package servo_test
 
 import (
-	"fmt"
-
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"testing"
+	"github.com/fgrosse/servo"
+	"fmt"
 )
+
+func TestServo(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Servo Test Suite")
+}
+
+type TestBundle struct {}
+
+func (b *TestBundle) Boot(kernel *servo.Kernel) {
+	kernel.RegisterType("test_bundle.my_type", NewService)
+}
+
+type SomeService struct {}
+
+func NewRecursiveService(*SomeService) *SomeService {
+	return &SomeService{}
+}
+
+func NewService() *SomeService {
+	return &SomeService{}
+}
+
+func NewServiceWithParam(param interface{}) *SomeService {
+	panic(param)
+	return &SomeService{}
+}
 
 // ServerMock is a non blocking noop implementation of servo.Server
 type ServerMock struct {

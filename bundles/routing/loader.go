@@ -21,7 +21,9 @@ func (l *Loader) Load(filename string) (map[string]*Route, error) {
 	}
 
 	for name, r := range routes {
-		r.EndpointTypeID = name
+		if r.EndpointTypeID == "" {
+			r.EndpointTypeID = name
+		}
 	}
 
 	return routes, nil

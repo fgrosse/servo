@@ -13,3 +13,11 @@ type FancyController struct {
 func (c *FancyController) FancyAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Service said: %q", c.Client.DoFancyStuff())
 }
+
+func (c *FancyController) OuterHandlerAction(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "OuterHandlerAction was called")
+}
+
+func (c *FancyController) SecondHandlerAction(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "SecondHandlerAction was called")
+}

@@ -7,3 +7,8 @@ servo
 [![license](https://img.shields.io/badge/license-MIT-4183c4.svg)](https://github.com/fgrosse/servo/blob/master/LICENSE)
 
 **Note: This project is at the very early stages of its development.**
+
+### Dependencies
+
+* go 1.3 or higher
+* TODO: document other dependent packages (yaml, logxi, gorilla/mux)

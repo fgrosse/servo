@@ -12,12 +12,12 @@ type Server interface {
 // DefaultServer is the standard implementation of the Server interface.
 type HTTPServer struct {
 	ListenAddress string
-	HandlerFunc   http.HandlerFunc
+	Handler http.Handler
 	Log           Logger
 }
 
 // NewHTTPServer creates a new HTTPServer
-func NewHTTPServer(listenAddress string, handler http.HandlerFunc, log Logger) *HTTPServer {
+func NewHTTPServer(listenAddress string, handler http.Handler, log Logger) *HTTPServer {
 	return &HTTPServer{listenAddress, handler, log}
 }
 

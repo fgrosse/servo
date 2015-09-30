@@ -15,7 +15,7 @@ type Logging struct {
 	Logger servo.Logger
 }
 
-// LoggingAdapter creates a new LoggingMiddleWare
+// LoggingAdapter creates a new Logging middleware
 func LoggingAdapter(logger servo.Logger) handler.Middleware {
 	return func(h http.Handler) http.Handler {
 		return &Logging{Handler: h, Logger: logger}

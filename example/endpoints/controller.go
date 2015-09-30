@@ -24,6 +24,10 @@ func (c *FancyController) SecondHandlerAction(w http.ResponseWriter, r *http.Req
 	fmt.Fprintln(w, "SecondHandlerAction was called")
 }
 
+func (c *FancyController) ErrorAction(w http.ResponseWriter, r *http.Request) {
+	panic(fmt.Errorf("OH MY GOD!"))
+}
+
 type ContainerAwareController struct {
 	Container *goldi.Container
 }

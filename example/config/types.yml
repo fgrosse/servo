@@ -27,6 +27,12 @@ types:
         args:
             - @container
 
+    custom_error_handler:
+        package: github.com/fgrosse/servo/example/lib
+        type:    MyErrorHandler
+        args:
+            #TODO: this seems to introduce a circular dependency?! - @logger
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Endpoints that are used by the router: #
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -40,6 +46,9 @@ types:
 
     controller_endpoint:
         func:    @my_controller::FancyAction
+
+    error_endpoint:
+        func:    @my_controller::ErrorAction
 
     container_aware_endpoint:
         func:    @my_container_aware_controller::SomeAction
@@ -63,9 +72,15 @@ types:
         factory: LoggingAdapter
         args:    [ @my_logger ]
 
+    my_app.error_handler:
+        package: github.com/fgrosse/servo/middleware
+        factory: ErrorHandlingAdapter
+        args:    [ "@custom_error_handler::HandleEndpointError" ]
+
     kernel.http_handler:
         package: github.com/fgrosse/servo/handler
         factory: MiddleWareAdapter
         args:
             - @servo.routing.router
+            - @my_app.error_handler
             - @my_app.logging_adapter

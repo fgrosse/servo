@@ -12,3 +12,6 @@ composed_endpoint:
 
 container_aware_endpoint:
     path: /container
+
+error_endpoint:
+    path: /error

@@ -6,7 +6,7 @@ types:
         package: github.com/fgrosse/servo/example/endpoints
         type:    FancyController
         args:
-            - "@my_service_client"
+            - @my_service_client
 
     my_service_client:
         package: github.com/fgrosse/servo/example/lib
@@ -20,6 +20,18 @@ types:
         args:    [ my_app ]
         calls: # TODO implement this in goldi
             - [ SetLevel, [ 10 ] ] # 10 = LevelTrace
+
+    my_container_aware_controller:
+        package: github.com/fgrosse/servo/example/endpoints
+        type:    ContainerAwareController
+        args:
+            - @container
+
+    custom_error_handler:
+        package: github.com/fgrosse/servo/example/lib
+        type:    MyErrorHandler
+        args:
+            #TODO: this seems to introduce a circular dependency?! - @logger
 
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Endpoints that are used by the router: #
@@ -35,12 +47,18 @@ types:
     controller_endpoint:
         func:    @my_controller::FancyAction
 
+    error_endpoint:
+        func:    @my_controller::ErrorAction
+
+    container_aware_endpoint:
+        func:    @my_container_aware_controller::SomeAction
+
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     # Endpoints can also be composed:        #
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     composed_endpoint:
-        package: github.com/fgrosse/servo/handlers
-        factory: ComposedHandler
+        package: github.com/fgrosse/servo/handler
+        factory: Composed
         args:
             - @my_controller::OuterHandlerAction
             - @my_controller::SecondHandlerAction
@@ -50,20 +68,19 @@ types:
     # Define our own http handler chain      #
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     my_app.logging_adapter:
-        package: github.com/fgrosse/servo/handlers
+        package: github.com/fgrosse/servo/middleware
         factory: LoggingAdapter
         args:    [ @my_logger ]
 
-    my_app.http_handler_func:
-        package: github.com/fgrosse/servo/handlers
-        factory: ComposedHandler
-        args:
-            # TODO add more to the chain
-            - @servo.routing.router::ServeHTTP
+    my_app.error_handler:
+        package: github.com/fgrosse/servo/middleware
+        factory: ErrorHandlingAdapter
+        args:    [ "@custom_error_handler::HandleEndpointError" ]
 
     kernel.http_handler:
-        package: github.com/fgrosse/servo/handlers
-        factory: AdapterHandler
+        package: github.com/fgrosse/servo/handler
+        factory: MiddleWareAdapter
         args:
+            - @servo.routing.router
+            - @my_app.error_handler
             - @my_app.logging_adapter
-            - @my_app.http_handler_func

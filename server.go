@@ -25,6 +25,6 @@ func NewHTTPServer(listenAddress string, handler http.HandlerFunc, log Logger) *
 // handle all incoming HTTP requests. The method blocks.
 func (s *HTTPServer) Run() error {
 	s.Log.Info("Server started", "address", s.ListenAddress)
-	http.HandleFunc("/", s.HandlerFunc)
+	http.Handle("/", s.Handler)
 	return http.ListenAndServe(s.ListenAddress, nil)
 }

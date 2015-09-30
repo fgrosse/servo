@@ -22,4 +22,3 @@ types:
         interface: Logger
         factory:   @logger_provider::GetLogger
         args:      [ servo ]
-

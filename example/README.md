@@ -7,7 +7,7 @@ The example here can change at any time and without extra notice.
 
 The example project is configured via the files in the [config](config) directory.
 Have a close look at [config/types.yml](config/types.yml) to see how the application is wired up.
-The individual routes are configured in [config/routes.yml].
+The individual routes are configured in [config/routes.yml](config/routes.yml).
 
 If you would deploy this application these files would remain unchanged.
 The [config/config.yml] in contrast contains actual configuration parameters that may change depending on the environment.

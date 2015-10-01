@@ -12,6 +12,10 @@ The individual routes are configured in [config/routes.yml](config/routes.yml).
 If you would deploy this application these files would remain unchanged.
 The [config/config.yml] in contrast contains actual configuration parameters that may change depending on the environment.
 
+Additionally the example uses some of the experimental bundles I already created. Checkout [main.go](main.go) for details.
+
+#### Run the example
+
 To run the example do:
 
 ```golang

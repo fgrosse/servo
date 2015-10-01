@@ -21,11 +21,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-/*
-error while generating type "kernel.http.server":
-	the referenced type "@kernel.http_handler"
-		type *middleware.Logging
-	can not be passed as argument 2 to the function signature
-		servo.NewHTTPServer(string, http.HandlerFunc, servo.Logger)
- */

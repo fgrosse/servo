@@ -18,7 +18,7 @@ install:
   - go get -v -t ./...
 
 script:
-  - go test A-cover -coverprofile servo.coverprofile .
+  - go test -cover -coverprofile servo.coverprofile .
   - go test -cover -coverprofile configuration.coverprofile ./configuration
 
 after_script:

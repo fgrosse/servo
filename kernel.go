@@ -1,11 +1,13 @@
 package servo
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/fgrosse/goldi"
+	"github.com/fgrosse/goldi/validation"
 	"github.com/fgrosse/servo/configuration"
 	"github.com/mgutz/logxi/v1"
-	"fmt"
-	"github.com/fgrosse/goldi/validation"
 )
 
 var KernelVersion = "unknown"
@@ -14,40 +16,50 @@ var KernelVersion = "unknown"
 // Once type registration is done it is started with its Run function.
 type Kernel struct {
 	goldi.TypeRegistry
-	log    Logger
+
+	// Config is a ConfigurationLoader that loads the configuration upon Kernel.Run
 	Config ConfigurationLoader
+
+	// Env identifies the environment the kernel runs in.
+	// If Env is empty a production environment is assumed. The value is usually set via
+	// the environment variable `SERVO_ENV`. Setting this variable to `dev` will configure
+	// the kernel for local development (i.e. print debug messages).
+	Env string
+
+	log Logger
 }
 
 // NewKernel creates a new kernel.
 // It will initialize the goldi.TypeRegistry and use the given configuration loader.
 // The actual loading of the configuration is deferred until kernel.Run is called.
+//
+// The kernel environment identifier is read from the os environment variable
+// `SERVO_ENV`. If SERVO_ENV is set to `dev` the internal log level will be set to debug.
 func NewKernel(config ConfigurationLoader) *Kernel {
 	kernel := &Kernel{
 		TypeRegistry: goldi.NewTypeRegistry(),
+		Env:          os.Getenv("SERVO_ENV"),
 		Config:       config,
 		log:          new(NullLogger),
+	}
+
+	if kernel.Env == "dev" {
+		kernel.log = log.New("kernel")
+		kernel.log.SetLevel(log.LevelDebug)
 	}
 
 	registerInternalTypes(kernel.TypeRegistry)
 	return kernel
 }
 
-// NewDebugKernel creates a new kernel just as NewKernel but immediately injects a logxi logger.
-func NewDebugKernel(config ConfigurationLoader) *Kernel {
-	kernel := NewKernel(config)
-	kernel.log = log.New("kernel")
-	kernel.log.SetLevel(log.LevelDebug)
-	return kernel
-}
-
+// Register is used to boot servo.Bundle with this kernel instance.
 func (k *Kernel) Register(bundle Bundle) {
 	k.log.Info("Loading bundle", "bundle", fmt.Sprintf("%T", bundle))
 	bundle.Boot(k)
 }
 
-// Run creates a goldi.Container based on the TypeRegistry of the kernel and used the configuration loader.
-// It does then instantiate the "kernel.server" type and calls Run on the resulting Server implementation.
-// This method blocks until the server returns from Run.
+// Run load the configuration and creates the DI container.
+// Afterwards the `kernel.http.server` type is created by the container and started.
 func (k *Kernel) Run() error {
 	k.log.Info("Starting servo kernel", "version", KernelVersion)
 	container, err := k.createContainer()
@@ -88,6 +100,7 @@ func (k *Kernel) createContainer() (*goldi.Container, error) {
 	return container, err
 }
 
+// TypeContainerValidator is the type ID that is used to get the container validator from the DI container.
 const TypeContainerValidator = "container.validator"
 
 func (k *Kernel) validateContainer(container *goldi.Container) error {

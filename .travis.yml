@@ -7,6 +7,10 @@ go:
   - 1.5
   - tip
 
+matrix:
+  allow_failures:
+    - go: tip
+
 install:
   - go get golang.org/x/tools/cmd/cover
   - go get github.com/modocache/gover
@@ -14,8 +18,8 @@ install:
   - go get -v -t ./...
 
 script:
-  - go test .               -cover -coverprofile servo.coverprofile
-  - go test ./configuration -cover -coverprofile configuration.coverprofile 
+  - go test A-cover -coverprofile servo.coverprofile .
+  - go test -cover -coverprofile configuration.coverprofile ./configuration
 
 after_script:
   - gover

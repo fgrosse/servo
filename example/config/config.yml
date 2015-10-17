@@ -1,9 +1,0 @@
-servo:
-    listen: 0.0.0.0:3000
-
-logxi:
-    level:  debug
-    #format: JSON # valid values are "happy", "text", "JSON", "LTSV"
-
-my_app:
-    some_parameter: I was configured via the config.yml

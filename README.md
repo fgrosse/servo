@@ -11,4 +11,6 @@ servo
 ### Dependencies
 
 * go 1.3 or higher
-* TODO: document other dependent packages (yaml, logxi, gorilla/mux)
+* [gopkg.in/yaml.v2][1] (LGPLv3)
+
+[1]: https://github.com/go-yaml/yaml/tree/v2

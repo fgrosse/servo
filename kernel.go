@@ -7,7 +7,6 @@ import (
 	"github.com/fgrosse/goldi"
 	"github.com/fgrosse/goldi/validation"
 	"github.com/fgrosse/servo/configuration"
-	"github.com/mgutz/logxi/v1"
 )
 
 var KernelVersion = "unknown"
@@ -26,7 +25,8 @@ type Kernel struct {
 	// the kernel for local development (i.e. print debug messages).
 	Env string
 
-	log Logger
+	// Log is the logger that is used by the kernel to print log messages.
+	Log Logger
 }
 
 // NewKernel creates a new kernel.
@@ -40,12 +40,12 @@ func NewKernel(config ConfigurationLoader) *Kernel {
 		TypeRegistry: goldi.NewTypeRegistry(),
 		Env:          os.Getenv("SERVO_ENV"),
 		Config:       config,
-		log:          new(NullLogger),
+		Log:          new(NullLogger),
 	}
 
 	if kernel.Env == "dev" {
-		kernel.log = log.New("kernel")
-		kernel.log.SetLevel(log.LevelDebug)
+		kernel.Log = NewSimpleLogger("kernel", os.Stdout)
+		kernel.Log.SetLevel(LevelDebug)
 	}
 
 	registerInternalTypes(kernel.TypeRegistry)
@@ -54,14 +54,14 @@ func NewKernel(config ConfigurationLoader) *Kernel {
 
 // Register is used to boot servo.Bundle with this kernel instance.
 func (k *Kernel) Register(bundle Bundle) {
-	k.log.Info("Loading bundle", "bundle", fmt.Sprintf("%T", bundle))
+	k.Log.Info("Loading bundle", "bundle", fmt.Sprintf("%T", bundle))
 	bundle.Boot(k)
 }
 
 // Run load the configuration and creates the DI container.
 // Afterwards the `kernel.http.server` type is created by the container and started.
 func (k *Kernel) Run() error {
-	k.log.Info("Starting servo kernel", "version", KernelVersion)
+	k.Log.Info("Starting servo kernel", "version", KernelVersion)
 	container, err := k.createContainer()
 	if err != nil {
 		return err
@@ -69,32 +69,33 @@ func (k *Kernel) Run() error {
 
 	server, err := container.Get("kernel.http.server")
 	if err != nil {
-		k.log.Fatal(err.Error())
+		k.Log.Error(err.Error())
+		os.Exit(1)
 	}
 
 	return server.(Server).Run()
 }
 
 func (k *Kernel) createContainer() (*goldi.Container, error) {
-	k.log.Debug("Loading the configuration..")
+	k.Log.Debug("Loading the configuration..")
 	config, err := k.Config.Load()
 	if err != nil {
 		return nil, err
 	}
 
-	k.log.Trace("Flattening the configuration..")
+	k.Log.Trace("Flattening the configuration..")
 	flattenedConfig := new(configuration.Flattener).Flatten(config)
-	k.log.Debug("Configuration has been loaded", "config", flattenedConfig)
+	k.Log.Debug("Configuration has been loaded", "config", flattenedConfig)
 
-	k.log.Debug("Creating goldi container")
+	k.Log.Debug("Creating goldi container")
 	container := goldi.NewContainer(k.TypeRegistry, flattenedConfig)
 	container.InjectInstance("container", container)
 
 	err = k.validateContainer(container)
 	if err != nil {
-		k.log.Error("Container is invalid", "error", err)
+		k.Log.Error("Container is invalid", "error", err)
 	} else {
-		k.log.Debug("Container passed validation")
+		k.Log.Debug("Container passed validation")
 	}
 
 	return container, err
@@ -104,13 +105,14 @@ func (k *Kernel) createContainer() (*goldi.Container, error) {
 const TypeContainerValidator = "container.validator"
 
 func (k *Kernel) validateContainer(container *goldi.Container) error {
-	k.log.Trace("Retrieving validator from container", "service_name", TypeContainerValidator)
+	k.Log.Trace("Retrieving validator from container", "service_name", TypeContainerValidator)
 	validator, err := container.Get(TypeContainerValidator)
 	if err != nil {
-		k.log.Fatal(err.Error())
+		k.Log.Error(err.Error())
+		os.Exit(1)
 	}
 
-	k.log.Debug("Validating container")
+	k.Log.Debug("Validating container")
 
 	return validator.(*validation.ContainerValidator).Validate(container)
 }
